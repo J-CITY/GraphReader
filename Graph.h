@@ -16,7 +16,6 @@ XML to Graph(V, E, C)
 V - vertex
 E - edges
 C - cost
-
 */
 
 const char* BOUND_MIN_LAT="minlat";
@@ -71,7 +70,7 @@ class Graph {
 public:
     Bound bound;
 
-    Grap(){}
+    Grap() {}
 
     /*Read graph from xml.*/
     void ReadGraphFromXML(std::string input) {
@@ -158,7 +157,18 @@ private:
         ///...
         int i = 0;
         std::string first;
-        element = element->FirstChildElement(ND);
+        element = element->FirstChildElement();
+        if (strcmp(element->Value(), ND)) {
+            while (element = element->NextSiblingElement()) {
+                if (element != nullptr && strcmp(element->Value(), ND)) {
+                    continue;
+                }
+                if (element != nullptr && !strcmp(element->Value(), ND)) {
+                    break;
+                }
+                return;
+            }
+        }
         do {
             if (i == 0) {
                 first = element->Attribute(ND_REF) == nullptr ? "" : element->Attribute(ND_REF);
