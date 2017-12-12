@@ -85,14 +85,16 @@ public:
                 TiXmlElement *pBounds = pRoot->FirstChildElement(BOUNDS);
                 ReadXmlBounds(pBounds);
 
-                TiXmlElement *pNode = pBounds;
-                while (pNode =  pNode->NextSiblingElement(NODE)) {
-                    ReadXmlNode(pNode);
-                }
-
-                TiXmlElement *pWay = pBounds;
-                while (pWay = pWay->NextSiblingElement(WAY)) {
-                    ReadXmlWay(pWay);
+                TiXmlElement *pElem = pBounds;
+                while (pElem =  pElem->NextSiblingElement()) {
+                    if (!strcmp(pElem->Value(), NODE)) {
+                        ReadXmlNode(pElem);
+                        continue;
+                    }
+                    if (!strcmp(pElem->Value(), WAY)) {
+                        ReadXmlWay(pElem);
+                        continue;
+                    }
                 }
             }
         } else {
