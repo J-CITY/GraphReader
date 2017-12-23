@@ -70,7 +70,7 @@ class Graph {
 public:
     Bound bound;
 
-    Grap() {}
+    Graph() {}
 
     /*Read graph from xml.*/
     void ReadGraphFromXML(std::string input) {
