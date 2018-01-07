@@ -1,50 +1,49 @@
 #include "Graph.h"
 
-/*Read graph from xml.*/
 void Graph::ReadGraphFromXML(std::string input) {
     TiXmlDocument doc(input.c_str());
-    //bool loadOkay = doc.LoadFile();
-    if(doc.LoadFile()) {
-        TiXmlHandle hDoc(&doc);
-        TiXmlElement *pRoot;
-        pRoot = doc.FirstChildElement(OSM);
-        if(pRoot) {
-            TiXmlElement *pBounds = pRoot->FirstChildElement(BOUNDS);
-            ReadXmlBounds(pBounds);
 
-            TiXmlElement *pElem = pBounds;
-            while (pElem =  pElem->NextSiblingElement()) {
-                if (!strcmp(pElem->Value(), NODE)) {
-                    ReadXmlNode(pElem);
-                    continue;
-                }
-                if (!strcmp(pElem->Value(), WAY)) {
-                    ReadXmlWay(pElem);
-                    continue;
-                }
-            }
-        }
-    } else {
+    if (!doc.LoadFile()) {
         std::cout << "ERROR: Could not load XML file: " + input << std::endl;
         return;
     }
-}
-    /*Read graph area from xml.*/
-void Graph::ReadXmlBounds(TiXmlElement* element) {
-    if (element) {
-        bound.minlat = atof(element->Attribute(BOUND_MIN_LAT) == nullptr ? "0" : element->Attribute(BOUND_MIN_LAT));
-        bound.minlon = atof(element->Attribute(BOUND_MIN_LON) == nullptr ? "0" : element->Attribute(BOUND_MIN_LON));
-        bound.maxlat = atof(element->Attribute(BOUND_MAX_LAT) == nullptr ? "0" : element->Attribute(BOUND_MAX_LAT));
-        bound.maxlon = atof(element->Attribute(BOUND_MAX_LON) == nullptr ? "0" : element->Attribute(BOUND_MIN_LON));
-        std::cout << "BOUNDS: \n";
-        std::cout << "MIN LAT: " << bound.minlat << std::endl;
-        std::cout << "MIN LON: " << bound.minlon << std::endl;
-        std::cout << "MAX LAT: " << bound.maxlat << std::endl;
-        std::cout << "MAX LON: " << bound.maxlon << std::endl;
+
+    TiXmlHandle hDoc(&doc);
+    TiXmlElement *pRoot;
+    pRoot = doc.FirstChildElement(OSM);
+
+    if (pRoot == nullptr) return;
+
+    TiXmlElement *pBounds = pRoot->FirstChildElement(BOUNDS);
+    ReadXmlBounds(pBounds);
+
+    TiXmlElement *pElem = pBounds;
+    while ((pElem = pElem->NextSiblingElement()) != nullptr) {
+        if (!strcmp(pElem->Value(), NODE)) {
+            ReadXmlNode(pElem);
+            continue;
+        }
+        if (!strcmp(pElem->Value(), WAY)) {
+            ReadXmlWay(pElem);
+            continue;
+        }
     }
 }
 
-    /*Read id and params.*/
+void Graph::ReadXmlBounds(TiXmlElement* element) {
+    if (!element) return;
+
+    bound.minlat = atof(element->Attribute(BOUND_MIN_LAT) == nullptr ? "0" : element->Attribute(BOUND_MIN_LAT));
+    bound.minlon = atof(element->Attribute(BOUND_MIN_LON) == nullptr ? "0" : element->Attribute(BOUND_MIN_LON));
+    bound.maxlat = atof(element->Attribute(BOUND_MAX_LAT) == nullptr ? "0" : element->Attribute(BOUND_MAX_LAT));
+    bound.maxlon = atof(element->Attribute(BOUND_MAX_LON) == nullptr ? "0" : element->Attribute(BOUND_MIN_LON));
+    std::cout << "BOUNDS: \n";
+    std::cout << "MIN LAT: " << bound.minlat << std::endl;
+    std::cout << "MIN LON: " << bound.minlon << std::endl;
+    std::cout << "MAX LAT: " << bound.maxlat << std::endl;
+    std::cout << "MAX LON: " << bound.maxlon << std::endl;
+}
+
 void Graph::ReadXmlNode(TiXmlElement* element) {
     if (element) {
         Node n;
@@ -68,30 +67,25 @@ void Graph::ReadXmlNode(TiXmlElement* element) {
     }
 }
 
-/*Read tags.*/
 void Graph::ReadXmlTags(TiXmlElement* element, Node &n) {
     do {
         std::string key = element->Attribute(TAG_KEY) == nullptr ? "" : element->Attribute(TAG_KEY);
         std::string val = element->Attribute(TAG_VALUE) == nullptr ? "" : element->Attribute(TAG_VALUE);
         std::cout << "TAG: " << key << " : " << val << std::endl;
         n.tags[key] = val;
-    } while(element = element->NextSiblingElement(TAG));
+    } while((element = element->NextSiblingElement(TAG)) != nullptr);
 }
 
-    /*Read ways.*/
 void Graph::ReadXmlWay(TiXmlElement* element) {
-    ///...
     int i = 0;
     std::string first;
     element = element->FirstChildElement();
     if (strcmp(element->Value(), ND)) {
-        while (element = element->NextSiblingElement()) {
-            if (element != nullptr && strcmp(element->Value(), ND)) {
+        while ((element = element->NextSiblingElement()) != nullptr) {
+            if (strcmp(element->Value(), ND))
                 continue;
-            }
-            if (element != nullptr && !strcmp(element->Value(), ND)) {
+            if (!strcmp(element->Value(), ND))
                 break;
-            }
             return;
         }
     }
@@ -99,27 +93,29 @@ void Graph::ReadXmlWay(TiXmlElement* element) {
         if (i == 0) {
             first = element->Attribute(ND_REF) == nullptr ? "" : element->Attribute(ND_REF);
             std::cout << "WAY: " << first << std::endl;
-        } else {
-            double cost = 0;
-            ///Average distance
-            ///L = d*R
-            ///R = 6371km
-            ///cos(d) = sin(p_a)*sin(p_b) + cos(p_a)*cos(p_b)*cos(l_a-l_b)
-            ///l - lon, p - lat
-            const char* ref = element->Attribute(ND_REF) == nullptr ? "" : element->Attribute(ND_REF);
-            double p_a = std::stod(nodes[first].params[PARAM_LAT]);
-            double p_b = std::stod(nodes[element->Attribute(ND_REF)].params[PARAM_LAT]);
-            double l_a = std::stod(nodes[first].params[PARAM_LON]);
-            double l_b = std::stod(nodes[element->Attribute(ND_REF)].params[PARAM_LON]);
-            double d = sin(p_a) * sin(p_b) +
-                       cos(p_a) * cos(p_b) *
-                       cos(l_a - l_b);
-            d = acos(d);
-            cost = d * 6371;//km
-            nodes[first].neighbors.push_back(std::make_pair(ref, cost));
-            first = ref;
-            std::cout << "WAY: " << ref << " " << cost << std::endl;
+            ++i;
+            continue;
         }
+        double cost = 0;
+        /** Average distance
+         * L = d*R
+         * R = 6371km
+         * cos(d) = sin(p_a)*sin(p_b) + cos(p_a)*cos(p_b)*cos(l_a-l_b)
+         * l - lon, p - lat
+         */
+        const char* ref = element->Attribute(ND_REF) == nullptr ? "" : element->Attribute(ND_REF);
+        double p_a = std::stod(nodes[first].params[PARAM_LAT]);
+        double p_b = std::stod(nodes[element->Attribute(ND_REF)].params[PARAM_LAT]);
+        double l_a = std::stod(nodes[first].params[PARAM_LON]);
+        double l_b = std::stod(nodes[element->Attribute(ND_REF)].params[PARAM_LON]);
+        double d = sin(p_a) * sin(p_b) +
+                   cos(p_a) * cos(p_b) *
+                   cos(l_a - l_b);
+        d = acos(d);
+        cost = d * 6371;//km
+        nodes[first].neighbors.emplace_back(std::make_pair(ref, cost));
+        first = ref;
+        std::cout << "WAY: " << ref << " " << cost << std::endl;
         ++i;
-    } while(element = element->NextSiblingElement(ND));
+    } while((element = element->NextSiblingElement(ND)) != nullptr);
 }
