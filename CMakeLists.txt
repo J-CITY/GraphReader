@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(TINY_XML tinystr.h tinystr.cpp tinyxml.h tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp)
 
-set(SOURCE_FILES Graph.h ${TINY_XML} main.cpp)
+set(SOURCE_FILES Graph.h Graph.cpp ${TINY_XML} main.cpp)
 
 add_executable(GraphReader ${SOURCE_FILES})
