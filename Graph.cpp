@@ -9,6 +9,7 @@ void Graph::clear() {
 }
 
 void Graph::ReadGraphFromXML(std::string input) {
+    //Setup TinyXML parser
     TiXmlDocument doc(input.c_str());
 
     if (!doc.LoadFile()) {
@@ -17,8 +18,9 @@ void Graph::ReadGraphFromXML(std::string input) {
     }
 
     TiXmlHandle hDoc(&doc);
-    TiXmlElement *pRoot;
-    pRoot = doc.FirstChildElement(OSM);
+
+    //Start "recording" data
+    TiXmlElement *pRoot = doc.FirstChildElement(OSM);
 
     if (pRoot == nullptr) return;
 
@@ -26,12 +28,14 @@ void Graph::ReadGraphFromXML(std::string input) {
 
     if (pElem == nullptr) return;
 
+    //Read info about bounds (if it exists)
     if (!strcmp(pElem->Value(), BOUNDS)) {
         ReadXmlBounds(pElem);
         pElem = pElem->NextSiblingElement();
         if (pElem == nullptr) return;
     }
 
+    //Read info about ways & nodes
     do {
         if (!strcmp(pElem->Value(), NODE)) {
             ReadXmlNode(pElem);
