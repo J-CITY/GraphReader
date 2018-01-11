@@ -89,7 +89,7 @@ private:
 
     /*Read ways.*/
     void ReadXmlWay(TiXmlElement* element);
-
+public:
     /*Graph nodes.*/
     std::map<std::string, Node> nodes;
 };
