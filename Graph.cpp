@@ -50,10 +50,10 @@ void Graph::ReadXmlBounds(TiXmlElement* element) {
     bound.maxlat = atof(element->Attribute(BOUND_MAX_LAT) == nullptr ? "0" : element->Attribute(BOUND_MAX_LAT));
     bound.maxlon = atof(element->Attribute(BOUND_MAX_LON) == nullptr ? "0" : element->Attribute(BOUND_MIN_LON));
     std::cout << "BOUNDS: \n";
-    std::cout << "MIN LAT: " << bound.minlat << std::endl;
-    std::cout << "MIN LON: " << bound.minlon << std::endl;
-    std::cout << "MAX LAT: " << bound.maxlat << std::endl;
-    std::cout << "MAX LON: " << bound.maxlon << std::endl;
+    std::cout << "\tMIN LAT: " << bound.minlat << std::endl;
+    std::cout << "\tMIN LON: " << bound.minlon << std::endl;
+    std::cout << "\tMAX LAT: " << bound.maxlat << std::endl;
+    std::cout << "\tMAX LON: " << bound.maxlon << std::endl;
 }
 
 void Graph::ReadXmlNode(TiXmlElement* element) {
