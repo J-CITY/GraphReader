@@ -22,20 +22,24 @@ void Graph::ReadGraphFromXML(std::string input) {
 
     if (pRoot == nullptr) return;
 
-    TiXmlElement *pBounds = pRoot->FirstChildElement(BOUNDS);
-    ReadXmlBounds(pBounds);
+    TiXmlElement *pElem = pRoot->FirstChildElement();
 
-    TiXmlElement *pElem = pBounds;
-    while ((pElem = pElem->NextSiblingElement()) != nullptr) {
+    if (pElem == nullptr) return;
+
+    if (!strcmp(pElem->Value(), BOUNDS)) {
+        ReadXmlBounds(pElem);
+        pElem = pElem->NextSiblingElement();
+        if (pElem == nullptr) return;
+    }
+
+    do {
         if (!strcmp(pElem->Value(), NODE)) {
             ReadXmlNode(pElem);
             continue;
         }
-        if (!strcmp(pElem->Value(), WAY)) {
+        if (!strcmp(pElem->Value(), WAY))
             ReadXmlWay(pElem);
-            continue;
-        }
-    }
+    } while ((pElem = pElem->NextSiblingElement()) != nullptr);
 }
 
 void Graph::ReadXmlBounds(TiXmlElement* element) {
