@@ -1,0 +1,78 @@
+\documentclass[a4paper,12pt]{extreport}
+% \usepackage{russianb}
+\usepackage[russian]{babel}
+\usepackage{float}
+\usepackage[TS1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[pdftex]{graphicx}
+\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{makecell}
+\graphicspath{{images/}}
+\DeclareGraphicsExtensions{.eps,.pdf,.png,.jpg}
+
+\usepackage{listings}
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+    {\filcenter\large}
+    {}
+    {8pt}
+    {\bfseries}{}
+
+\titleformat{\section}
+    {\normalsize\bfseries}
+    {\thesection}
+    {1em}{}
+
+\titleformat{\subsection}
+    {\normalsize\bfseries}
+    {\thesubsection}
+    {1em}{}
+
+\titleformat{\subsubsection}
+    {\normalsize\bfseries}
+    {\thesubsubsection}
+    {1em}{}
+
+\titlespacing*{\chapter}{0pt}{30pt}{8pt}
+\titlespacing*{\section}{\parindent}{*4}{*4}
+\titlespacing*{\subsection}{\parindent}{*4}{*4}
+\titlespacing*{\subsubsection}{\parindent}{*4}{*4}
+
+\usepackage{geometry}
+\geometry{left=2cm}
+\geometry{right=1.5cm}
+\geometry{top=1cm}
+\geometry{bottom=2cm}
+\parindent=1cm
+
+\makeatletter
+\renewcommand\chapter{\par
+\thispagestyle{plain}
+\@afterindentfalse \secdef\@chapter\@schapter}
+\makeatother
+
+\newcommand{\codepart}[1]
+{{\ttfamily \textbf{#1}}}
+
+% Custom
+\usepackage{xhfill}
+\usepackage{array}
+\usepackage{fancyhdr}
+
+\begin{document}
+  \input{core/title}
+  \newpage
+  \tableofcontents
+  \newpage
+  \input{core/task}
+  \newpage
+  % \setlength{\extrarowheight}{0.5em}
+  \input{core/introduction}
+  \input{core/main}
+  \input{core/conclusion}
+\end{document}
