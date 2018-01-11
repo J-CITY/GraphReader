@@ -45,18 +45,59 @@ void Graph::ReadXmlBounds(TiXmlElement* element) {
 }
 
 void Graph::ReadXmlNode(TiXmlElement* element) {
-    if (element) {
+    if (element != nullptr) {
         Node n;
         n.id = element->Attribute(PARAM_ID) == nullptr ? "" : element->Attribute(PARAM_ID);
         std::cout << "NODE ID: " << n.id << std::endl;
-        n.params[PARAM_LAT] = element->Attribute(PARAM_LAT) == nullptr ? "" : element->Attribute(PARAM_LAT);
-        n.params[PARAM_LON] = element->Attribute(PARAM_LON) == nullptr ? "" : element->Attribute(PARAM_LON);
-        n.params[PARAM_USER] = element->Attribute(PARAM_USER) == nullptr ? "" : element->Attribute(PARAM_USER);
-        n.params[PARAM_UID] = element->Attribute(PARAM_UID) == nullptr ? "" : element->Attribute(PARAM_UID);
-        n.params[PARAM_VISIBLE] = element->Attribute(PARAM_VISIBLE) == nullptr ? "" : element->Attribute(PARAM_VISIBLE);
-        n.params[PARAM_VERSION] = element->Attribute(PARAM_VERSION) == nullptr ? "" : element->Attribute(PARAM_VERSION);
-        n.params[PARAM_CHANGESET] = element->Attribute(PARAM_CHANGESET) == nullptr ? "" : element->Attribute(PARAM_CHANGESET);
-        n.params[PARAM_TIMESTAMP] = element->Attribute(PARAM_TIMESTAMP) == nullptr ? "" : element->Attribute(PARAM_TIMESTAMP);
+        const char* buff;
+
+        buff = element->Attribute(PARAM_LAT);
+        if (buff != nullptr) {
+            n.params[PARAM_LAT] = buff;
+            std::cout << "\tLAT: " << buff << std::endl;
+        } else n.params[PARAM_LAT] = "";
+
+        buff = element->Attribute(PARAM_LON);
+        if (buff != nullptr) {
+            n.params[PARAM_LON] = buff;
+            std::cout << "\tLON: " << buff << std::endl;
+        } else n.params[PARAM_LON] = "";
+
+        buff = element->Attribute(PARAM_USER);
+        if (buff != nullptr) {
+            n.params[PARAM_USER] = buff;
+            std::cout << "\tUSER: " << buff << std::endl;
+        } else n.params[PARAM_USER] = "";
+
+        buff = element->Attribute(PARAM_UID);
+        if (buff != nullptr) {
+            n.params[PARAM_UID] = buff;
+            std::cout << "\tUID: " << buff << std::endl;
+        } else n.params[PARAM_UID] = "";
+
+        buff = element->Attribute(PARAM_VISIBLE);
+        if (buff != nullptr) {
+            n.params[PARAM_VISIBLE] = buff;
+            std::cout << "\tVISIBLE: " << buff << std::endl;
+        } else n.params[PARAM_VISIBLE] = "";
+
+        buff = element->Attribute(PARAM_VERSION);
+        if (buff != nullptr) {
+            n.params[PARAM_VERSION] = buff;
+            std::cout << "\tVERSION: " << buff << std::endl;
+        } else n.params[PARAM_VERSION] = "";
+
+        buff = element->Attribute(PARAM_CHANGESET);
+        if (buff != nullptr) {
+            n.params[PARAM_CHANGESET] = buff;
+            std::cout << "\tCHANGESET: " << buff << std::endl;
+        } else n.params[PARAM_CHANGESET] = "";
+
+        buff = element->Attribute(PARAM_TIMESTAMP);
+        if (buff != nullptr) {
+            n.params[PARAM_TIMESTAMP] = buff;
+            std::cout << "\tTIMESTAMP: " << buff << std::endl;
+        } else n.params[PARAM_TIMESTAMP] = "";
 
         TiXmlElement *pTag = element->FirstChildElement(TAG);
         if (pTag) {
@@ -69,30 +110,41 @@ void Graph::ReadXmlNode(TiXmlElement* element) {
 
 void Graph::ReadXmlTags(TiXmlElement* element, Node &n) {
     do {
-        std::string key = element->Attribute(TAG_KEY) == nullptr ? "" : element->Attribute(TAG_KEY);
-        std::string val = element->Attribute(TAG_VALUE) == nullptr ? "" : element->Attribute(TAG_VALUE);
-        std::cout << "TAG: " << key << " : " << val << std::endl;
+        const char* key = element->Attribute(TAG_KEY);
+        const char* val = element->Attribute(TAG_VALUE);
+        std::cout << "\tTAG: "
+                  << (key == nullptr ? "": key)
+                  << " > "
+                  << (val == nullptr ? "": val) << std::endl;
         n.tags[key] = val;
     } while((element = element->NextSiblingElement(TAG)) != nullptr);
 }
 
 void Graph::ReadXmlWay(TiXmlElement* element) {
+    const char* id = element->Attribute(PARAM_ID);
+    std::cout << "WAY: " << (id == nullptr ? "" : id) << std::endl;
+
     int i = 0;
     std::string first;
     element = element->FirstChildElement();
-    if (strcmp(element->Value(), ND)) {
-        while ((element = element->NextSiblingElement()) != nullptr) {
-            if (strcmp(element->Value(), ND))
-                continue;
-            if (!strcmp(element->Value(), ND))
-                break;
-            return;
-        }
-    }
+
     do {
+        //Read WAY TAG
+        if (!strcmp(element->Value(), TAG)) {
+            const char* key = element->Attribute(TAG_KEY);
+            const char* val = element->Attribute(TAG_VALUE);
+            std::cout << "\tTAG: "
+                      << (key == nullptr ? "": key)
+                      << " > "
+                      << (val == nullptr ? "": val) << std::endl;
+            continue;
+        }
+        //Read NODE id & calculate distance
+        if (strcmp(element->Value(), ND)) break;
+
         if (i == 0) {
             first = element->Attribute(ND_REF) == nullptr ? "" : element->Attribute(ND_REF);
-            std::cout << "WAY: " << first << std::endl;
+            std::cout << "\tNODE: " << first << std::endl;
             ++i;
             continue;
         }
@@ -113,9 +165,14 @@ void Graph::ReadXmlWay(TiXmlElement* element) {
                    cos(l_a - l_b);
         d = acos(d);
         cost = d * 6371;//km
+
         nodes[first].neighbors.emplace_back(std::make_pair(ref, cost));
+        nodes[ref].neighbors.emplace_back(std::make_pair(first, cost));
+
+        std::cout << "\tNODE: " << ref << std::endl
+                  << "\t\tDIST: " << cost << std::endl;
+
         first = ref;
-        std::cout << "WAY: " << ref << " " << cost << std::endl;
         ++i;
-    } while((element = element->NextSiblingElement(ND)) != nullptr);
+    } while((element = element->NextSiblingElement()) != nullptr);
 }
