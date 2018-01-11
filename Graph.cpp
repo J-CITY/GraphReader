@@ -1,5 +1,13 @@
 #include "Graph.h"
 
+void Graph::clear() {
+    this->bound.maxlat =
+    this->bound.maxlon =
+    this->bound.minlat =
+    this->bound.minlon = 0;
+    this->nodes.clear();
+}
+
 void Graph::ReadGraphFromXML(std::string input) {
     TiXmlDocument doc(input.c_str());
 

@@ -75,6 +75,8 @@ public:
     /*Read graph from xml.*/
     void ReadGraphFromXML(std::string input);
 
+    /*Clean Graph*/
+    void clear();
 private:
     /*Read graph area from xml.*/
     void ReadXmlBounds(TiXmlElement* element);
