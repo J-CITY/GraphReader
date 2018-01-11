@@ -116,9 +116,9 @@ void Graph::ReadXmlNode(TiXmlElement* element) {
         } else n.params[PARAM_TIMESTAMP] = "";
 
         TiXmlElement *pTag = element->FirstChildElement(TAG);
-        if (pTag) {
-            ReadXmlTags(pTag, n);
-        }
+
+        //Read all tags from node's "children"
+        if (pTag != nullptr) ReadXmlTags(pTag, n);
 
         nodes[n.id] = n;
     }
