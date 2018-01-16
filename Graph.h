@@ -72,6 +72,10 @@ public:
 
     Graph() = default;
 
+    const int __PRINT_CONSOLE = 1;
+    const int __PRINT_NOT = 0;
+    int __PRINT = 0;
+
     /*Read graph from xml.*/
     void ReadGraphFromXML(std::string input);
 
