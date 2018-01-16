@@ -44,3 +44,51 @@
 	"tinyxml.h"
 	<windows.h>
 
+1516108707 source:c:\users\333da\desktop\grfull\graphreader\graph.cpp
+	"Graph.h"
+	<utility>
+	<cmath>
+	<iostream>
+	<fstream>
+	<cstdlib>
+	<ctime>
+
+1516108550 c:\users\333da\desktop\grfull\graphreader\graph.h
+	<vector>
+	<map>
+	<string>
+	"tinyxml.h"
+
+1516108386 c:\users\333da\desktop\grfull\graphreader\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"tinystr.h"
+
+1516108386 c:\users\333da\desktop\grfull\graphreader\tinystr.h
+	<assert.h>
+	<string.h>
+
+1516108386 source:c:\users\333da\desktop\grfull\graphreader\tinystr.cpp
+	"tinystr.h"
+
+1516108386 source:c:\users\333da\desktop\grfull\graphreader\tinyxml.cpp
+	<ctype.h>
+	<sstream>
+	<iostream>
+	"tinyxml.h"
+
+1516108386 source:c:\users\333da\desktop\grfull\graphreader\tinyxmlerror.cpp
+	"tinyxml.h"
+
+1516108386 source:c:\users\333da\desktop\grfull\graphreader\tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"tinyxml.h"
+	<windows.h>
+

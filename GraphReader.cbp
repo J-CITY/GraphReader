@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Graph.cpp" />
 		<Unit filename="Graph.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="tinystr.cpp" />

@@ -1,4 +1,10 @@
 #include "Graph.h"
+#include <utility>
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
 
 void Graph::clear() {
     this->bound.maxlat =
@@ -160,11 +166,12 @@ void Graph::ReadXmlTags(TiXmlElement* element, Node &n) {
 }
 
 void Graph::ReadXmlWay(TiXmlElement* element) {
+    Way way;
     const char* id = element->Attribute(PARAM_ID);
     if (__PRINT == __PRINT_CONSOLE) {
         std::cout << "WAY: " << (id == nullptr ? "" : id) << std::endl;
     }
-
+    way.id = id;
     int i = 0;
     std::string first;
     element = element->FirstChildElement();
@@ -180,6 +187,7 @@ void Graph::ReadXmlWay(TiXmlElement* element) {
                           << " > "
                           << (val == nullptr ? "" : val) << std::endl;
             }
+            way.nodes.push_back(first);
             continue;
         }
         //Read NODE id & calculate distance
@@ -201,6 +209,7 @@ void Graph::ReadXmlWay(TiXmlElement* element) {
          * l - lon, p - lat
          */
         const char* ref = element->Attribute(ND_REF) == nullptr ? "" : element->Attribute(ND_REF);
+        way.nodes.push_back(ref);
         double p_a = std::stod(nodes[first].params[PARAM_LAT] == "" ?
                                "-1" : nodes[first].params[PARAM_LAT]);
         double p_b = std::stod(nodes[element->Attribute(ND_REF)].params[PARAM_LAT] == "" ?
@@ -225,4 +234,86 @@ void Graph::ReadXmlWay(TiXmlElement* element) {
         first = ref;
         ++i;
     } while((element = element->NextSiblingElement()) != nullptr);
+    ways.push_back(way);
+}
+
+
+void Graph::SaveToXML(std::string filename) {
+    std::ofstream fout(filename);
+
+    fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    fout << "<osm version=\"0.6\" generator=\"CGImap 0.0.2\">\n";
+
+    fout << "<bounds minlat=\"" << bound.minlat <<
+        "\" minlon=\"" << bound.minlon <<
+        "\" maxlat=\"" << bound.maxlat <<
+        "\" maxlon=\"" << bound.maxlon << "\"/>\n";
+
+    for(auto& item : nodes) {
+        fout << "<node " << "id=" << "\"" << item.second.id << "\"";
+        for(auto& p : item.second.params) {
+            fout << p.first << "=\"" << p.second << "\" ";
+        }
+
+        fout << ">\n";
+        for(auto& t : item.second.tags) {
+            fout << "<tag k=\"" << t.first << "\" v=\"" << t.second << "\"/>\n";
+        }
+        fout << "</node>\n";
+    }
+
+    for (auto i = 0; i < ways.size(); ++i) {
+        fout << "<way id=\"" << ways[i].id << "\" >\n";
+        for (auto j = 0; j < ways[i].nodes.size(); ++j) {
+            fout << "<nd ref=\"" << ways[i].nodes[j] << "\"/>\n";
+        }
+        fout << "</way>\n";
+    }
+
+    fout << "</osm>\n";
+    fout.close();
+}
+
+/*Save grapx to <node0 node1 cost> format*/
+void Graph::SaveToTXT(std::string filename) {
+    std::ofstream fout(filename);
+    for(auto& item : nodes) {
+        for (auto i = 0; i < item.second.neighbors.size(); ++i) {
+            fout << item.second.id << " " << item.second.neighbors[i].first
+                << " " << item.second.neighbors[i].second << "\n";
+        }
+    }
+    fout.close();
+}
+
+void Graph::GenTest(unsigned int nodeSize, std::string filename) {
+    srand( time( 0 ) );
+    std::ofstream fout(filename);
+
+    fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    fout << "<osm version=\"0.6\" generator=\"CGImap 0.0.2\">\n";
+
+    fout << "<bounds minlat=\"" << std::to_string(0) <<
+        "\" minlon=\"" << std::to_string(0) <<
+        "\" maxlat=\"" << std::to_string(nodeSize) <<
+        "\" maxlon=\"" << std::to_string(nodeSize) << "\"/>";
+
+    for(auto i =0; i < nodeSize; ++i) {
+        fout << "<node " << "id=" << "\"" << i << "\"";
+
+        fout << "lat=\"" << rand() % nodeSize
+            << "\" lon=\"" << rand() % nodeSize << "\"";
+
+        fout << ">\n";
+        fout << "</node>\n";
+    }
+    fout << "<way id=\"42\">\n";
+    for (int i = 0; i < nodeSize / 2 + rand() % nodeSize; ++i) {
+        int n = rand() % nodeSize;
+        fout << "<nd ref=\"" << n << "\"/>\n";
+    }
+    fout << "</way>\n";
+
+    fout << "</osm>\n";
+    fout.close();
 }

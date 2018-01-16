@@ -1,12 +1,9 @@
 #ifndef GRAPH_INCLUDED
 #define GRAPH_INCLUDED
 
-#include <iostream>
 #include <vector>
 #include <map>
 #include <string>
-#include <utility>
-#include <cmath>
 #include "tinyxml.h"
 
 /*
@@ -58,6 +55,13 @@ public:
     std::vector<std::pair<std::string, double>> neighbors;//node, cost
 };
 
+
+class Way {
+public:
+    std::string id;
+    std::vector<std::string> nodes;
+};
+
 /*geographical area of the graph*/
 struct Bound {
     double minlat = 0;
@@ -96,6 +100,13 @@ private:
 public:
     /*Graph nodes.*/
     std::map<std::string, Node> nodes;
+
+    std::vector<Way> ways;
+
+    void SaveToXML(std::string filename);
+    /*Save grapx to <node0 node1 cost> format*/
+    void SaveToTXT(std::string filename);
+    void GenTest(unsigned int nodeSize, std::string filename);
 };
 
 #endif // GRAPH_INCLUDED
