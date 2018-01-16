@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="CGImap 0.0.2">
+ <bounds minlat="54.0889580" minlon="12.2487570" maxlat="54.0913900" maxlon="12.2524800"/>
+
+ <node id="1" lat="1" lon="1" user="user" uid="1" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="2" lat="2" lon="2" user="user" uid="2" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="3" lat="3" lon="3" user="user" uid="3" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="4" lat="4" lon="4" user="user" uid="4" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="5" lat="5" lon="5" user="user" uid="5" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="6" lat="6" lon="6" user="user" uid="6" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="7" lat="7" lon="7" user="user" uid="7" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="8" lat="8" lon="8" user="user" uid="8" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="9" lat="9" lon="9" user="user" uid="9" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="0" lat="0" lon="0" user="user" uid="0" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+
+ <node id="10" lat="10" lon="10" user="user" uid="10" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="11" lat="11" lon="11" user="user" uid="11" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="12" lat="12" lon="12" user="user" uid="12" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="13" lat="13" lon="13" user="user" uid="13" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="14" lat="14" lon="14" user="user" uid="14" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="15" lat="15" lon="15" user="user" uid="15" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="16" lat="16" lon="16" user="user" uid="16" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="17" lat="17" lon="17" user="user" uid="17" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="18" lat="18" lon="18" user="user" uid="18" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+ <node id="19" lat="19" lon="19" user="user" uid="19" visible="true" version="1" changeset="676636" timestamp="2008-09-21T21:37:45Z"/>
+
+
+ <way id="1" user="Masch" uid="55988" visible="true" version="5" changeset="4142606" timestamp="2010-03-16T11:47:08Z">
+  <nd ref="0"/>
+  <nd ref="1"/>
+  <nd ref="2"/>
+  <nd ref="3"/>
+  <nd ref="4"/>
+  <nd ref="5"/>
+  <nd ref="6"/>
+  <nd ref="7"/>
+  <nd ref="8"/>
+  <nd ref="9"/>
+  <nd ref="0"/>
+  <nd ref="11"/>
+  <nd ref="12"/>
+  <nd ref="13"/>
+  <nd ref="14"/>
+  <nd ref="15"/>
+  <nd ref="16"/>
+  <nd ref="17"/>
+  <nd ref="18"/>
+  <nd ref="19"/>
+ </way>
+</osm>
