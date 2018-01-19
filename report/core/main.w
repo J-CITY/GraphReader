@@ -18,7 +18,72 @@
 \subsection{Реализация}
 \noindent\indent Интерфейс программного решения расположен в файле Graph.h и
 представляет из себя класс \codepart{Graph}
-@d class Graph @{
+@D Graph @{
+#ifndef GRAPH_INCLUDED
+#define GRAPH_INCLUDED
+
+#include <vector>
+#include <map>
+#include <string>
+#include "tinyxml.h"
+
+/*
+Read graph with tinyxml lib.
+
+XML to Graph(V, E, C)
+V - vertex
+E - edges
+C - cost
+*/
+
+const char* const BOUND_MIN_LAT="minlat";
+const char* const BOUND_MIN_LON="minlon";
+const char* const BOUND_MAX_LAT="maxlat";
+const char* const BOUND_MAX_LON="maxlon";
+
+const char* const OSM="osm";
+const char* const BOUNDS="bounds";
+const char* const NODE="node";
+const char* const WAY="way";
+const char* const TAG="tag";
+
+const char* const PARAM_ID="id";
+const char* const PARAM_LAT="lat";
+const char* const PARAM_LON="lon";
+const char* const PARAM_USER="user";
+const char* const PARAM_UID="uid";
+const char* const PARAM_VISIBLE="visible";
+const char* const PARAM_VERSION="version";
+const char* const PARAM_CHANGESET="changeset";
+const char* const PARAM_TIMESTAMP="timestamp";
+
+const char* const TAG_KEY="k";
+const char* const TAG_VALUE="v";
+
+const char* const ND="nd";
+const char* const ND_REF="ref";
+class Node {
+public:
+    /*unique id*/
+    std::string id;
+    /*node params like lat., lon., timestamp, etc*/
+    std::map<std::string, std::string> params;
+    /*some node tags <key, value>*/
+    std::map<std::string, std::string> tags;
+    /*neighbors id`s and way cost to neighbor*/
+    std::vector<std::pair<std::string, double>> neighbors;//node, cost
+};
+class Way {
+public:
+    std::string id;
+    std::vector<std::string> nodes;
+};
+struct Bound {
+    double minlat = 0;
+    double minlon = 0;
+    double maxlat = 0;
+    double maxlon = 0;
+};
 class Graph {
 public:
     Bound bound;
@@ -40,6 +105,7 @@ public:
     void SaveToTXT(std::string filename);
     void GenTest(unsigned int nodeSize, std::string filename);
 };
+#endif // GRAPH_INCLUDED
 @}
 Основным методом данного класса является \codepart{ReadGraphFromXML},
 принимающий на вход путь до OSM XML файла.
@@ -128,87 +194,87 @@ do {
 @}
 Для обработки данных о каждом узле используется метод \codepart{ReadXmlNode},
 внутри которого считывается и выводится в стандартный выходной поток его содержимое.
-@d method ReadXmlNode @{
+@D method ReadXmlNode @{
 void Graph::ReadXmlNode(TiXmlElement* element) {
-    if (element != nullptr) {
-        Node n;
-        n.id = element->Attribute(PARAM_ID) == nullptr ? "" : element->Attribute(PARAM_ID);
-        if (__PRINT == __PRINT_CONSOLE) {
-            std::cout << "NODE ID: " << n.id << std::endl;
-        }
-        const char* buff;
-
-        buff = element->Attribute(PARAM_LAT);
-        if (buff != nullptr) {
-            n.params[PARAM_LAT] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tLAT: " << buff << std::endl;
-            }
-        } else n.params[PARAM_LAT] = "";
-
-        buff = element->Attribute(PARAM_LON);
-        if (buff != nullptr) {
-            n.params[PARAM_LON] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tLON: " << buff << std::endl;
-            }
-        } else n.params[PARAM_LON] = "";
-
-        buff = element->Attribute(PARAM_USER);
-        if (buff != nullptr) {
-            n.params[PARAM_USER] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tUSER: " << buff << std::endl;
-            }
-        } else n.params[PARAM_USER] = "";
-
-        buff = element->Attribute(PARAM_UID);
-        if (buff != nullptr) {
-            n.params[PARAM_UID] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tUID: " << buff << std::endl;
-            }
-        } else n.params[PARAM_UID] = "";
-
-        buff = element->Attribute(PARAM_VISIBLE);
-        if (buff != nullptr) {
-            n.params[PARAM_VISIBLE] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tVISIBLE: " << buff << std::endl;
-            }
-        } else n.params[PARAM_VISIBLE] = "";
-
-        buff = element->Attribute(PARAM_VERSION);
-        if (buff != nullptr) {
-            n.params[PARAM_VERSION] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tVERSION: " << buff << std::endl;
-            }
-        } else n.params[PARAM_VERSION] = "";
-
-        buff = element->Attribute(PARAM_CHANGESET);
-        if (buff != nullptr) {
-            n.params[PARAM_CHANGESET] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tCHANGESET: " << buff << std::endl;
-            }
-        } else n.params[PARAM_CHANGESET] = "";
-
-        buff = element->Attribute(PARAM_TIMESTAMP);
-        if (buff != nullptr) {
-            n.params[PARAM_TIMESTAMP] = buff;
-            if (__PRINT == __PRINT_CONSOLE) {
-                std::cout << "\tTIMESTAMP: " << buff << std::endl;
-            }
-        } else n.params[PARAM_TIMESTAMP] = "";
-
-        TiXmlElement *pTag = element->FirstChildElement(TAG);
-
-        //Read all tags from node's "children"
-        if (pTag != nullptr) ReadXmlTags(pTag, n);
-
-        nodes[n.id] = n;
+    if (element == nullptr)
+      return;
+    Node n;
+    n.id = element->Attribute(PARAM_ID) == nullptr ? "" : element->Attribute(PARAM_ID);
+    if (__PRINT == __PRINT_CONSOLE) {
+        std::cout << "NODE ID: " << n.id << std::endl;
     }
+    const char* buff;
+
+    buff = element->Attribute(PARAM_LAT);
+    if (buff != nullptr) {
+        n.params[PARAM_LAT] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tLAT: " << buff << std::endl;
+        }
+    } else n.params[PARAM_LAT] = "";
+
+    buff = element->Attribute(PARAM_LON);
+    if (buff != nullptr) {
+        n.params[PARAM_LON] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tLON: " << buff << std::endl;
+        }
+    } else n.params[PARAM_LON] = "";
+
+    buff = element->Attribute(PARAM_USER);
+    if (buff != nullptr) {
+        n.params[PARAM_USER] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tUSER: " << buff << std::endl;
+        }
+    } else n.params[PARAM_USER] = "";
+
+    buff = element->Attribute(PARAM_UID);
+    if (buff != nullptr) {
+        n.params[PARAM_UID] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tUID: " << buff << std::endl;
+        }
+    } else n.params[PARAM_UID] = "";
+
+    buff = element->Attribute(PARAM_VISIBLE);
+    if (buff != nullptr) {
+        n.params[PARAM_VISIBLE] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tVISIBLE: " << buff << std::endl;
+        }
+    } else n.params[PARAM_VISIBLE] = "";
+
+    buff = element->Attribute(PARAM_VERSION);
+    if (buff != nullptr) {
+        n.params[PARAM_VERSION] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tVERSION: " << buff << std::endl;
+        }
+    } else n.params[PARAM_VERSION] = "";
+
+    buff = element->Attribute(PARAM_CHANGESET);
+    if (buff != nullptr) {
+        n.params[PARAM_CHANGESET] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tCHANGESET: " << buff << std::endl;
+        }
+    } else n.params[PARAM_CHANGESET] = "";
+
+    buff = element->Attribute(PARAM_TIMESTAMP);
+    if (buff != nullptr) {
+        n.params[PARAM_TIMESTAMP] = buff;
+        if (__PRINT == __PRINT_CONSOLE) {
+            std::cout << "\tTIMESTAMP: " << buff << std::endl;
+        }
+    } else n.params[PARAM_TIMESTAMP] = "";
+
+    TiXmlElement *pTag = element->FirstChildElement(TAG);
+
+    //Read all tags from node's "children"
+    if (pTag != nullptr) ReadXmlTags(pTag, n);
+
+    nodes[n.id] = n;
 }
 @}
 Для обработки дополнительных тэгов узла используется вспомогательный метод
@@ -363,120 +429,6 @@ void Graph::SaveToTXT(std::string filename) {
     fout.close();
 }
 @}
-\section{Листинг кода}
-@o Graph.h @{
-#ifndef GRAPH_INCLUDED
-#define GRAPH_INCLUDED
-
-#include <vector>
-#include <map>
-#include <string>
-#include "tinyxml.h"
-
-/*
-Read graph with tinyxml lib.
-
-XML to Graph(V, E, C)
-V - vertex
-E - edges
-C - cost
-*/
-
-const char* const BOUND_MIN_LAT="minlat";
-const char* const BOUND_MIN_LON="minlon";
-const char* const BOUND_MAX_LAT="maxlat";
-const char* const BOUND_MAX_LON="maxlon";
-
-const char* const OSM="osm";
-const char* const BOUNDS="bounds";
-const char* const NODE="node";
-const char* const WAY="way";
-const char* const TAG="tag";
-
-const char* const PARAM_ID="id";
-const char* const PARAM_LAT="lat";
-const char* const PARAM_LON="lon";
-const char* const PARAM_USER="user";
-const char* const PARAM_UID="uid";
-const char* const PARAM_VISIBLE="visible";
-const char* const PARAM_VERSION="version";
-const char* const PARAM_CHANGESET="changeset";
-const char* const PARAM_TIMESTAMP="timestamp";
-
-const char* const TAG_KEY="k";
-const char* const TAG_VALUE="v";
-
-const char* const ND="nd";
-const char* const ND_REF="ref";
-@}
-@o Graph.h @{
-class Node {
-public:
-    /*unique id*/
-    std::string id;
-    /*node params like lat., lon., timestamp, etc*/
-    std::map<std::string, std::string> params;
-    /*some node tags <key, value>*/
-    std::map<std::string, std::string> tags;
-    /*neighbors id`s and way cost to neighbor*/
-    std::vector<std::pair<std::string, double>> neighbors;//node, cost
-};
-class Way {
-public:
-    std::string id;
-    std::vector<std::string> nodes;
-};
-struct Bound {
-    double minlat = 0;
-    double minlon = 0;
-    double maxlat = 0;
-    double maxlon = 0;
-};
-@< class Graph @>
-#endif // GRAPH_INCLUDED
-@}
-@o Graph.cpp @{
-#include "Graph.h"
-#include <utility>
-#include <cmath>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <ctime>
-
-@< method clear @>
-@< method ReadGraphFromXML @>
-@< method ReadXmlBounds @>
-@< method ReadXmlNode @>
-@< method ReadXmlTags @>
-@< method ReadXmlWay @>
-@< method SaveToXML @>
-@< method SaveToTXT @>
-@< method GenTest @>
-@}
-@o main.cpp @{
-#include "Graph.h"
-#include <ctime>
-#include <iostream>
-
-using namespace std;
-
-int main() {
-    clock_t time;
-    time = clock();
-
-    Graph g;
-    //g.ReadGraphFromXML("RU-MAG-1.osm");
-    //g.ReadGraphFromXML("test1.xml");
-    g.ReadGraphFromXML("test.xml");
-
-    g.SaveToTXT("out.xml");
-
-    time = clock() - time;
-    std::cout << time/CLOCKS_PER_SEC << endl;
-    return 0;
-}
-@}
 \chapter*{Тестирование}
 \addcontentsline{toc}{chapter}{Тестирование}
 Для тестирования был написан генератор тестов, который генерируется OSM файл.
@@ -529,3 +481,51 @@ void Graph::GenTest(unsigned int nodeSize, std::string filename) {
 Время работы от 0.1 до 20 секунд.
 Список фрагментов
 @m
+\newpage
+\chapter*{Приложение}
+@o Graph.h @{
+ @< Graph @>
+@}
+@o Graph.cpp @{
+#include "Graph.h"
+#include <utility>
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+
+@< method clear @>
+@< method ReadGraphFromXML @>
+@< method ReadXmlBounds @>
+@< method ReadXmlNode @>
+@< method ReadXmlTags @>
+@< method ReadXmlWay @>
+@< method SaveToXML @>
+@< method SaveToTXT @>
+@< method GenTest @>
+@}
+@o main.cpp @{
+#include "Graph.h"
+#include <ctime>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    clock_t time;
+    time = clock();
+
+    Graph g;
+    //g.ReadGraphFromXML("RU-MAG-1.osm");
+    //g.ReadGraphFromXML("test1.xml");
+    g.ReadGraphFromXML("test.xml");
+
+    g.SaveToTXT("out.xml");
+
+    time = clock() - time;
+    std::cout << time/CLOCKS_PER_SEC << endl;
+    return 0;
+}
+@}
+\newpage
